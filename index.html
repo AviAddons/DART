@@ -13,17 +13,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&display=swap" rel="stylesheet">
   
   <style>
+    /* Centralizing Themes Using Custom CSS Variables */
+    :root {
+      --glow-start: #00f2fe;
+      --glow-end: #4facfe;
+      --bg-color: #050510;
+      --panel-bg: rgba(8, 8, 20, 0.65);
+      --text-muted: #798ea9;
+    }
+
     body, html {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #050510; 
+      background-color: var(--bg-color); 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: background-color 0.5s ease;
     }
 
     #bgCanvas {
@@ -34,6 +44,391 @@
       height: 100%;
       z-index: 1;
     }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 85%;
+      max-width: 400px;
+      text-align: center;
+      padding: 35px 24px;
+      background: var(--panel-bg); 
+      border-radius: 24px;
+      backdrop-filter: blur(16px); 
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.8rem;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+      letter-spacing: 6px; 
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--glow-start), var(--glow-end), var(--glow-start));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: logoShine 4s linear infinite;
+      text-shadow: 0 0 25px rgba(0, 242, 254, 0.15);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    @keyframes logoShine {
+      to { background-position: 200% center; }
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      line-height: 1.5;
+    }
+
+    /* Redesigned Search Wrapper to accommodate UI items natively */
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
+      box-sizing: border-box;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .search-wrapper:focus-within {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--glow-start);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+    }
+
+    input {
+      flex: 1;
+      padding: 16px 20px 16px 24px;
+      font-size: 16px; 
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #fff;
+      box-sizing: border-box;
+    }
+
+    input::placeholder { color: #4a5d78; }
+
+    .mic-button {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      padding-right: 20px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      outline: none;
+    }
+
+    .mic-button.listening {
+      color: var(--glow-start);
+      animation: pulseGlow 1.2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from { transform: scale(1); opacity: 0.6; }
+      to { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* Smart Clipboard Pill Accent */
+    .clip-prompt {
+      display: none;
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px dashed var(--glow-start);
+      color: #fff;
+      font-size: 0.8rem;
+      border-radius: 30px;
+      cursor: pointer;
+      animation: fadeIn 0.3s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Private Ghost History Grid System */
+    .history-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 25px;
+      min-height: 32px;
+    }
+
+    .history-tile {
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #a4b8d1;
+      font-size: 0.78rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .history-tile:active {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--glow-start);
+      color: #fff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hint { margin-top: 25px; font-size: 0.78rem; color: #485970; line-height: 1.4; }
+  </style>
+</head>
+<body>
+
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="container">
+    <h1 id="logo" title="Tap to switch engine theme">DART</h1>
+    <p>Straight-to-destination web navigation. Skips results pages instantly.</p>
+    
+    <div class="search-wrapper">
+      <input type="search" id="launcherInput" placeholder="Where to? (e.g., imdb matrix)" autocomplete="off" autofocus />
+      <button class="mic-button" id="micBtn">🎤</button>
+    </div>
+
+    <div id="clipPrompt" class="clip-prompt"></div>
+    <div id="historyContainer" class="history-container"></div>
+
+    <div class="hint">Tap the <b>DART</b> header logo to alter visual matrix pulses.</div>
+  </div>
+
+  <script>
+    // 1. ENGINE THEME SYSTEM
+    const themes = [
+      { start: '#00f2fe', end: '#4facfe', particle: 'rgba(0, 242, 254, 0.4)', line: 'rgba(79, 172, 254, 0.2)' },
+      { start: '#00ff66', end: '#009933', particle: 'rgba(0, 255, 102, 0.4)', line: 'rgba(0, 153, 51, 0.2)' },
+      { start: '#ff007f', end: '#7f00ff', particle: 'rgba(255, 0, 127, 0.4)', line: 'rgba(127, 0, 255, 0.2)' }
+    ];
+    let currentThemeIndex = 0;
+
+    document.getElementById('logo').addEventListener('click', () => {
+      currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+      const theme = themes[currentThemeIndex];
+      document.documentElement.style.setProperty('--glow-start', theme.start);
+      document.documentElement.style.setProperty('--glow-end', theme.end);
+    });
+
+    // 2. CANVAS PARTICLE SYSTEM WITH MATRIX TRACKING
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const particleCount = 28;
+    const connectionDistance = 110;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 2 + 1;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = themes[currentThemeIndex].particle;
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < connectionDistance) {
+            const opacity = 1 - (distance / connectionDistance);
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = themes[currentThemeIndex].line;
+            ctx.lineWidth = 0.7;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // 3. NAVIGATION CORE MECHANICS & HOTKEYS ENGINE
+    const input = document.getElementById('launcherInput');
+    
+    const speedHotkeys = {
+      'yt': 'https://youtube.com',
+      'r': 'https://reddit.com',
+      'g': 'https://mail.google.com',
+      'x': 'https://x.com',
+      'ig': 'https://instagram.com'
+    };
+
+    function executeNavigation(query) {
+      query = query.trim();
+      if (!query) return;
+
+      // Track destination locally before transforming text strings
+      saveGhostHistory(query);
+
+      // Check Speed Hotkey conditions
+      const lowerQuery = query.toLowerCase();
+      if (speedHotkeys[lowerQuery]) {
+        window.location.href = speedHotkeys[lowerQuery];
+        return;
+      }
+
+      // Check clean web domain structures
+      const isUrl = query.includes('.') && !query.includes(' ');
+      if (isUrl) {
+        if (!query.startsWith('http')) query = 'https://' + query;
+        window.location.href = query;
+      } else {
+        // Skip DuckDuckGo indexing directly to first link configuration
+        window.location.href = `https://duckduckgo.com/?q=\\${encodeURIComponent(query)}`;
+      }
+    }
+
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        executeNavigation(input.value);
+      }
+    });
+
+    // 4. SPEECH TRANSCRIPTION DRIVER
+    const micBtn = document.getElementById('micBtn');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+
+      micBtn.addEventListener('click', () => {
+        if (micBtn.classList.contains('listening')) {
+          recognition.stop();
+        } else {
+          micBtn.classList.add('listening');
+          recognition.start();
+        }
+      });
+
+      recognition.onresult = (event) => {
+        const textTranscript = event.results[0][0].transcript;
+        input.value = textTranscript;
+        executeNavigation(textTranscript);
+      };
+
+      recognition.onerror = () => micBtn.classList.remove('listening');
+      recognition.onend = () => micBtn.classList.remove('listening');
+    } else {
+      micBtn.style.display = 'none'; // Clean graceful exit fallback for unsupportive view structures
+    }
+
+    // 5. SECURE SMART CLIPBOARD CAPSULE INTERACTION
+    const clipPrompt = document.getElementById('clipPrompt');
+    
+    input.addEventListener('focus', async () => {
+      try {
+        // Web standard permissions hook
+        const clipboardText = await navigator.clipboard.readText();
+        if (clipboardText.trim().length > 0 && clipboardText !== input.value) {
+          clipPrompt.innerText = `📋 Warp to: "${clipboardText.substring(0, 22)}${clipboardText.length > 22 ? '...' : ''}"`;
+          clipPrompt.style.display = 'inline-block';
+          
+          clipPrompt.onclick = () => {
+            input.value = clipboardText;
+            clipPrompt.style.display = 'none';
+            executeNavigation(clipboardText);
+          };
+        }
+      } catch (err) {
+        // Fail quietly if user denies clipboard permissions locally
+      }
+    });
+
+    input.addEventListener('input', () => {
+      clipPrompt.style.display = 'none';
+    });
+
+    // 6. LOCAL PRIVATE GHOST HISTORY CORE
+    function getGhostHistory() {
+      return JSON.parse(localStorage.getItem('dart_ghost_history') || '[]');
+    }
+
+    function saveGhostHistory(item) {
+      let history = getGhostHistory();
+      history = history.filter(q => q.toLowerCase() !== item.toLowerCase()); // Avoid redundancies
+      history.unshift(item);
+      if (history.length > 4) history.pop(); // Hard cap system boundary
+      localStorage.setItem('dart_ghost_history', JSON.stringify(history));
+      renderGhostTiles();
+    }
+
+    function renderGhostTiles() {
+      const wrapper = document.getElementById('historyContainer');
+      const items = getGhostHistory();
+      wrapper.innerHTML = '';
+      
+      items.forEach(textString => {
+        const capsule = document.createElement('div');
+        capsule.className = 'history-tile';
+        capsule.innerText = textString.length > 12 ? textString.substring(0, 10) + '...' : textString;
+        capsule.title = textString;
+        
+        capsule.addEventListener('click', () => {
+          input.value = textString;
+          executeNavigation(textString);
+        });
+        wrapper.appendChild(capsule);
+      });
+    }
+
+    // Initialize history visibility metrics on load bounds
+    renderGhostTiles();
+  </script>
+</body>
+</html>
 
     .container {
       position: relative;
